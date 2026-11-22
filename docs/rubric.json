@@ -1,0 +1,79 @@
+{
+  "Metadata Model": [
+    "A data model or schema exists and is open-sourced;",
+    "It is machine-readable (JSON, XLSX, an API);",
+    "The metadata model connects subjects, samples and files, preserving the context needed for long-term reuse;",
+    "It states which fields are required;",
+    "The metadata model is applied in practice and verified on real-world data."
+  ],
+  "Ontologies & Vocabularies": [
+    "Anatomy/tissue uses an ontology (e.g., UBERON) for cross-program comparison;",
+    "Disease/phenotype applies an ontology (e.g., DOID, MONDO, HPO) for consistent cohorts;",
+    "Assay type employs an ontology (e.g., OBI) so methods stay clear;",
+    "Terms are stored as ontology IDs, not labels, so renaming does not alter context;",
+    "Most records have terms filled in, in addition to the schema."
+  ],
+  "Persistent Identifiers": [
+    "Program-assigned IDs are stable over time;",
+    "Datasets carry a DOI or registered accession;",
+    "Each release has its own versioned ID for exact citation;",
+    "Records cross-reference external databases for lasting links;",
+    "Record IDs persist across releases, so reuse stays traceable."
+  ],
+  "Overall Interoperability": [
+    "A DRC-approved C2M2 submission presently hosted on the CFDE Workbench;",
+    "The submission is current, reflecting the latest data release through quarterly updates;",
+    "Submitted data files are individually listed, retrievable and verifiable (access link, checksum);",
+    "Clinical data are structured in, or mapped to, the OMOP CDM, enabling harmonized analysis with other CF Program and health system datasets;",
+    "All dataset variables and survey instruments are aligned with NIH CDEs, supporting consistent measures across CF Programs and NIH-funded studies."
+  ],
+  "Processing Provenance": [
+    "Processing steps are documented for future users;",
+    "Software versions are recorded;",
+    "Processing code is publicly archived on a public repository;",
+    "Each data release includes the processing version used (pipeline, software or protocol);",
+    "Each output file has an execution record."
+  ],
+  "Sample Lineage": [
+    "Records exist for each subject;",
+    "Data samples link to their source subject;",
+    "Files link to their source samples;",
+    "Links use stored IDs instead of free text;",
+    "Most of the samples from the dataset is fully linked."
+  ],
+  "Versioning": [
+    "Dataset releases are versioned;",
+    "Dataset releases are dated;",
+    "Earlier dataset release versions remain accessible;",
+    "Each dataset release version has its own persistent ID;",
+    "A version history connects all dataset releases."
+  ],
+  "Documentation": [
+    "Dataset release notes are published;",
+    "Dataset release notes are dated;",
+    "Every dataset release version has dataset release notes;",
+    "Dataset release notes explain what changed and why;",
+    "Changes are itemized by record or file."
+  ],
+  "Current Status": [
+    "The website is active;",
+    "Data were updated in the past 12 months;",
+    "Metadata and/or code were updated in the past 12 months;",
+    "News and/or announcements were posted in the past 12 months;",
+    "Data can be accessed or downloaded."
+  ],
+  "Long-term Home": [
+    "A copy is deposited in a trusted public repository;",
+    "Most of the data are preserved on an open-sourced domain;",
+    "Primary data are retained and accessible (controlled access qualifies);",
+    "Data use open, community-standard file formats;",
+    "Datasets are registered in public catalogs (e.g., dbGaP, CFDE)."
+  ],
+  "Reuse & Support": [
+    "A data license or data use agreement is in-place;",
+    "The data access pathway is documented;",
+    "A written data management and preservation plan exists;",
+    "Post-award support is actively pursued; community ownerships are identified;",
+    "A designated user support contact is provided."
+  ]
+}

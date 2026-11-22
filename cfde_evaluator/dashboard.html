@@ -1,0 +1,79 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CFDE · Sustainability review</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f3f6f8;color:#152f40;font:16px/1.55 "Source Sans 3",system-ui,sans-serif}header{background:#123846;color:white;padding:1rem max(5vw,20px);letter-spacing:.03em}main{max-width:1180px;margin:auto;padding:30px 20px}h1{font:600 clamp(2rem,5vw,3rem)/1.1 Georgia,serif;margin:0 0 22px}h2{font-size:1.22rem;margin:0 0 12px}section,form{background:white;border:1px solid #cedade;border-radius:10px;padding:20px;margin-bottom:16px}form{display:flex;align-items:end;gap:14px;flex-wrap:wrap}label{display:grid;font-weight:600;gap:4px}input,select,button{font:inherit;border-radius:5px;padding:7px 14px}select{min-width:14rem;background:white;color:inherit;border:1px solid #93a8ad}button{border:0;background:#006b63;color:white;font-weight:600;cursor:pointer}button:disabled{opacity:.55}#current{font-weight:650}progress{width:100%;accent-color:#08766c}#columns{display:grid;grid-template-columns:3fr 2fr;gap:16px}details{border-top:1px solid #dce4e5;padding:10px 0}summary{cursor:pointer;font-weight:600}small,time{color:#516870}li{padding:4px 0}p{margin:.4rem 0}a{color:#006b63;overflow-wrap:anywhere}#log{max-height:66vh;overflow:auto}#log div{border-top:1px solid #e4e9eb;padding:7px 0}time{display:block;font:13px monospace}#outcome{font-weight:bold;color:#005e57} @media(max-width:760px){#columns{display:block}}
+.table-scroll{overflow-x:auto}table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}th,td{text-align:center;padding:.4rem .6rem;border-bottom:1px solid #dce4e5}th:first-child{text-align:left}thead,tfoot{background:#eef4f5}td[data-mark="1"]{color:#005e57}td[data-mark="0"]{color:#923b22}tfoot td{text-align:right;font-weight:600}
+.review-button{background:#fff0c4;color:#654100;border:1px solid #b07818;white-space:nowrap;padding:.25rem .65rem}.review-item{background:#fff6da;border-left:4px solid #b07818;padding:.6rem;margin:.45rem 0;scroll-margin:1rem}.review-item:focus,.review-button:focus-visible{outline:3px solid #126c90;outline-offset:2px}
+</style><header>CFDE &nbsp; / &nbsp; Dataset evaluation</header><main><h1>Sustainability review</h1>
+<form id="form"><label>Common Fund program<select id="program" required disabled><option value="">Loading programs…</option></select></label><label>Claude API key<input id="api-key" type="password" autocomplete="off" placeholder="Used for this run only" required></label><button id="start" disabled>Start fresh evaluation</button></form>
+<section><h2>Current activity</h2><p id="current" role="status">Ready to evaluate a public submission.</p><progress id="bar" max="11" value="0"></progress><small id="count">0 of 11 criteria completed</small><p id="outcome"></p></section>
+<section><h2>Score overview</h2><p><a href="http://127.0.0.1:8766/" target="_blank" rel="noopener">Review and score completed assessments</a></p><div class="table-scroll"><table aria-label="Sustainability marks by criterion and rubric element"><thead><tr><th>Criterion</th><th>Element 1</th><th>Element 2</th><th>Element 3</th><th>Element 4</th><th>Element 5</th><th>Score</th></tr></thead><tbody id="marks"></tbody><tfoot><tr><th>Overall</th><td colspan="6" id="overall"></td></tr></tfoot></table></div></section>
+<div id="columns"><section><h2>Criteria and evidence</h2><div id="criteria"></div></section><section><h2>Activity log</h2><div id="log"></div></section></div></main>
+<script>
+const el=id=>document.getElementById(id);
+function node(tag,text){const n=document.createElement(tag);n.textContent=text;return n}
+const cards=new Map();let rubric={},runId=null,seen=0,done=0;
+let awarded=0,resolved=0;
+function reset(){cards.clear();awarded=0;resolved=0;el('marks').replaceChildren();el('overall').textContent='Awaiting evaluation';el('criteria').replaceChildren();done=0;updateCount();
+ for(const [name,elements] of Object.entries(rubric)){
+ const panel=node('details',''),heading=node('summary',name+' · Waiting'),list=node('ol','');
+ elements.forEach(e=>list.append(node('li',e)));panel.append(heading,list);el('criteria').append(panel);const row=node('tr','');row.append(node('th',name));
+ const cells=elements.map(element=>{const cell=node('td','—');cell.title=element;row.append(cell);return cell});
+ const subtotal=node('td','Waiting');row.append(subtotal);el('marks').append(row);
+ cards.set(name,{heading,list,cells,subtotal});}}
+function updateCount(){el('bar').value=done;el('count').textContent=done+' of 11 criteria completed'}
+function link(url){const a=node('a',url);if(/^https?:\/\//i.test(url)){a.href=url;a.target='_blank';a.rel='noreferrer'}return a}
+function show(e){if(e.release)reset();
+ const line=node('div','');line.append(node('time',e.time),node('span',e.message));
+ if(e.source)line.append(node('br',''),link(e.source));el('log').prepend(line);el('current').textContent=e.message;
+ if(e.outcome)el('outcome').textContent=e.message;
+ const card=cards.get(e.criterion);if(!card)return;
+ if(!e.result){card.heading.textContent=e.criterion+' · In progress';card.subtotal.textContent='In progress';return}
+ const r=e.result;card.heading.textContent=e.criterion+' · '+(r.score===null?'Review required':r.score+'/5');
+ card.subtotal.textContent=r.score===null?'Pending':r.score+'/5';
+ r.elements.forEach((item,index)=>{
+   const cell=card.cells[index];cell.textContent=item.mark===null?'Pending':String(item.mark);
+   cell.dataset.mark=String(item.mark);cell.title=item.element+' — '+item.reason;
+   if(item.mark!==null){resolved++;awarded+=item.mark}
+ });
+ const pending=(done+1)*5-resolved;
+ el('overall').textContent=resolved===55?awarded+'/55':
+   awarded+' points awarded · '+resolved+'/55 resolved'+(pending?' · '+pending+' pending review':'');
+ card.list.replaceChildren();for(const [index,item] of r.elements.entries()){const li=node('li','');li.append(node('strong',(item.mark===null?'Pending':item.mark+'/1')+' · '+item.element),node('p',item.reason));
+ if(item.mark===null){
+   li.className='review-item';li.tabIndex=-1;
+   const button=node('button','Review');
+   button.type='button';button.className='review-button';
+   button.setAttribute('aria-label','Review '+e.criterion+', element '+(index+1)+': '+item.element);
+   button.addEventListener('click',()=>{
+     card.list.closest('details').open=true;
+     li.focus({preventScroll:true});
+     li.scrollIntoView({block:'center'});
+   });
+   card.cells[index].replaceChildren(button);
+   const entry=link('http://127.0.0.1:8766/?'+new URLSearchParams({program:el('program').value,criterion:e.criterion,element:index}));
+   entry.textContent='Score this element in the latest completed assessment';
+   li.append(entry);
+   li.append(node('p',item.sources.length?'Evidence for manual review':'No specific evidence file was cited for this element.'));
+ }
+ for(const url of item.sources){li.append(link(url),node('br',''))}card.list.append(li)}done++;updateCount()}
+async function poll(){try{const r=await fetch('/state');if(!r.ok)throw Error();const s=await r.json();if(runId!==s.run){runId=s.run;seen=0;el('log').replaceChildren();el('outcome').textContent='';reset();if(s.program){const menu=el('program');if(!Array.from(menu.options).some(o=>o.value===s.program))menu.add(new Option(s.program,s.program));menu.value=s.program}}
+ s.events.slice(seen).forEach(show);seen=s.events.length;el('start').disabled=s.running||!el('program').value;el('program').disabled=s.running||!el('program').value;
+ }catch{el('current').textContent='Connection interrupted. Reconnecting…'}setTimeout(poll,800)}
+el('form').onsubmit=async e=>{e.preventDefault();el('start').disabled=true;try{const r=await fetch('/run',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({program:el('program').value.trim(),key:el('api-key').value.trim()})});if(!r.ok)throw Error();el('api-key').value=''}catch{el('current').textContent='Could not start scoring. Check the program, Claude key and local server.'}};
+(async()=>{
+ rubric=await (await fetch('/rubric')).json();
+ const menu=el('program');
+ try{
+   const response=await fetch('/programs');
+   if(!response.ok)throw Error();
+   const programs=await response.json();
+   if(!programs.length)throw Error();
+   menu.replaceChildren(...programs.map(name=>new Option(name,name)));
+   menu.value=programs.includes('4DN')?'4DN':programs[0];
+ }catch{
+   menu.replaceChildren(new Option('Program list unavailable · refresh to retry',''));
+ }
+ poll();
+})()
+</script></html>

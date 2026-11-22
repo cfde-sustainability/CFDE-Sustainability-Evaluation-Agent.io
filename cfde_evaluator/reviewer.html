@@ -1,0 +1,37 @@
+<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CFDE · Team review</title>
+<style>body{font:16px/1.5 system-ui;color:#173640;background:#f4f7f8;margin:auto;max-width:900px;padding:24px}section,details{padding:14px;background:white;border:1px solid #c7d6d9;border-radius:8px;margin:8px 0}summary,button{cursor:pointer;font-weight:600}button,select,input,textarea{font:inherit;padding:6px}label{display:grid;gap:3px;margin:8px 0}article{border-top:1px solid #ddd;margin-top:12px}button{color:white;background:#006b63;border:0;border-radius:4px}button:disabled{opacity:.5}a{color:#006b63;overflow-wrap:anywhere}</style>
+<h1>Team review and verification</h1><label>Completed assessment<select id="runs"></select></label><section><strong id="status"></strong> <button id="verify">Confirm team recount</button><p id="feedback" role="status"></p></section><main></main>
+<script>
+const $=id=>document.getElementById(id), n=(tag,t='')=>{const x=document.createElement(tag);x.textContent=t;return x};
+const params=new URLSearchParams(location.search);
+async function post(data){
+ const r=await fetch('/decision',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...data,run:$('runs').value})});
+ if(!r.ok)throw Error((await r.json()).error||'Save failed');
+}
+async function render(openName){
+ const run=$('runs').value;if(!run){$('status').textContent='No completed assessments yet';$('verify').disabled=true;return}
+ const r=await (await fetch('/report?run='+encodeURIComponent(run))).json();
+ $('status').textContent=r.status+' · '+r.points+' points awarded · '+r.pending+' pending · '+(r.verified?'Team recount confirmed':'Awaiting team verification');
+ $('verify').disabled=!!r.pending||r.verified;
+ const main=document.querySelector('main');main.replaceChildren();
+ for(const [name,c] of Object.entries(r.criteria)){
+  const d=n('details');d.open=name===openName;d.append(n('summary',name+' · '+(c.score===null?'Review required':c.score+'/5')));
+  c.elements.forEach((x,index)=>{
+   const a=n('article');a.append(n('h3',x.element),n('p','Agent: '+(x.mark===null?'Pending':x.mark?'Yes (1)':'No (0)')+' · '+x.reason));
+   for(const url of x.sources){const l=n('a',url);if(/^https?:\/\//.test(url))l.href=url;l.target='_blank';l.rel='noreferrer';a.append(l,n('br'))}
+   if(x.human)a.append(n('p','Saved team decision: '+(x.human.mark?'Yes (1)':'No (0)')+' · '+x.human.reason+' · '+x.human.source));
+   const f=n('form'),mark=n('select'),reason=n('textarea'),source=n('input');
+   for(const [label,value] of [['Choose a score',''],['Yes · 1 point','1'],['No · 0 points','0']])mark.add(new Option(label,value));
+   mark.value=x.human?String(x.human.mark):'';reason.value=x.human?.reason||'';source.value=x.human?.source||x.sources[0]||'';
+   for(const [label,field] of [['Team score',mark],['Reason for the score',reason],['Evidence URL, file or record reference',source]]){const l=n('label',label);field.required=true;l.append(field);f.append(l)}
+   const b=n('button','Save decision');f.append(b);f.onsubmit=async e=>{e.preventDefault();b.disabled=true;try{await post({criterion:name,index,mark:Number(mark.value),reason:reason.value,source:source.value});await render(name);$('feedback').textContent='Decision saved and scores recounted.'}catch(err){$('feedback').textContent=err.message;b.disabled=false}};
+   a.id='element-'+Object.keys(r.criteria).indexOf(name)+'-'+index;a.append(f);d.append(a)
+  });main.append(d)
+ }
+}
+$('runs').onchange=()=>render();$('verify').onclick=async()=>{try{await post({verify:true});await render();$('feedback').textContent='Verification recorded.'}catch(err){$('feedback').textContent=err.message}};
+(async()=>{const runs=await(await fetch('/runs')).json();for(const [id,p,date,num] of runs)$('runs').add(new Option(p+' · '+date+' · assessment '+num,id));
+const target=runs.find(row=>row[1]===params.get('program'));if(target)$('runs').value=target[0];
+await render(params.get('criterion'));if(target&&params.has('element')){const d=document.querySelector('details[open]');d?.querySelectorAll('article')[Number(params.get('element'))]?.scrollIntoView()}
+})()
+</script>
