@@ -88,7 +88,7 @@ def package(asset):
 
 def inspect_archive(source, sha256):
     with zipfile.ZipFile(source) as archive:
-        manifest, = [p for p in archive.namelist() if Path(p).name == "datapackage.json"
+        manifest, = [p for p in archive.namelist() if Path(p).name.lower() in {"datapackage.json", "c2m2_datapackage.json"}
                      and "__MACOSX" not in p]
         tables = {}
         for resource in json.loads(archive.read(manifest))["resources"]:

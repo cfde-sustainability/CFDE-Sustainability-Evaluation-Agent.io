@@ -1,0 +1,30 @@
+name: Refresh public CFDE measurements
+on:
+  schedule:
+    - cron: '27 7 * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+  pages: write
+concurrency: refresh-cfde-evidence
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements.txt
+      - run: python scripts/refresh_evidence.py
+      - name: Publish updated public measurements
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/evidence.json
+          git commit -m "Refresh public CFDE measurements"
+          git push origin HEAD:main
+          gh api --method POST "repos/$GITHUB_REPOSITORY/pages/builds"

@@ -2,6 +2,12 @@
 
 Select a Common Fund program, inspect its approved C2M2 submission, and score 55 rubric elements with evidence. The team can review individual scores and confirm the recount. Each manual request runs a fresh assessment.
 
+## Score on the website
+
+Open the [hosted scoring dashboard](https://yrenat.github.io/CSDE-Auto-Evaluation/), select an approved release and enter your Claude key. The browser calls Anthropic directly and starts a fresh evaluation. The release menu shows the public measurements available and when they were checked. Resolve outstanding scores in the team review section and download the JSON assessment before closing the tab.
+
+The key stays in memory for the run. Scores and human decisions on the hosted dashboard stay in the browser tab until exported. The Python application below also supports an on-disk review history and a release watcher.
+
 ## Run the dashboard
 
 Use Python 3.10+ on Linux or macOS. In the repository folder:
@@ -29,4 +35,4 @@ The score and watch commands prompt for a hidden key or use ANTHROPIC_API_KEY if
 
 ## GitHub Pages
 
-Publish the docs folder from main. The project page displays the scoring rubric, describes the workflow, and links to the local dashboard. Python services and credentials stay on the user's computer.
+Publish the docs folder from main. A scheduled GitHub Actions job refreshes public package measurements daily. Scoring requests are made live by visitors using their own Anthropic API credits. The public evidence catalogue contains release identifiers and aggregate table measurements.
