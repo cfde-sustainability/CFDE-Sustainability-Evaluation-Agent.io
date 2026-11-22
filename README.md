@@ -1,10 +1,10 @@
 # CFDE sustainability scoring
 
-Select a Common Fund program, inspect its approved C2M2 submission, and score 55 rubric elements with evidence. The team can review individual scores and confirm the recount. Each manual request runs a fresh assessment.
+Select a Common Fund program, inspect its Workbench submission, and score 55 rubric elements with evidence. The team can review individual scores and confirm the recount. Each manual request runs a fresh assessment.
 
 ## Score on the website
 
-Open the [hosted scoring dashboard](https://yrenat.github.io/CSDE-Auto-Evaluation/), select an approved release and enter your Claude key. The browser calls Anthropic directly and starts a fresh evaluation. The release menu shows the public measurements available and when they were checked. Resolve outstanding scores in the team review section and download the JSON assessment before closing the tab.
+Open the [hosted scoring dashboard](https://yrenat.github.io/CSDE-Auto-Evaluation/), select a listed submission and enter your Claude key. The browser calls Anthropic directly and starts a fresh evaluation. The release menu shows the public measurements available and when they were checked. Resolve outstanding scores in the team review section and download the JSON assessment before closing the tab.
 
 The key stays in memory for the run. Scores and human decisions on the hosted dashboard stay in the browser tab until exported. The Python application below also supports an on-disk review history and a release watcher.
 
@@ -25,13 +25,17 @@ In another terminal, start team review:
 
 Open http://127.0.0.1:8766 to score a completed assessment and record reasons and evidence.
 
+## Which programs can be scored?
+
+The November 21 evaluation report screens for a data or metadata submission in the Workbench. The DRC approval of a current C2M2 submission is one element of Overall Interoperability. DCC and DRC flags do not determine entry to scoring. When a program has no current C2M2 package, the evaluator can use its other listed Workbench submissions. Table measurements apply to C2M2 packages.
+
 ## Command line
 
     python cfde_evaluator/evaluate.py inspect --program 4DN
     python cfde_evaluator/evaluate.py score --program 4DN
     python cfde_evaluator/evaluate.py watch --interval 3600
 
-The score and watch commands prompt for a hidden key or use ANTHROPIC_API_KEY if set. The watch command polls for newly observed approved releases. Use --json for machine-readable scores. To inspect a downloaded 4DN package offline, run python cfde_evaluator/offline_demo.py PATH_TO_ZIP.
+The score and watch commands prompt for a hidden key or use ANTHROPIC_API_KEY if set. The watch command polls for newly observed releases. Use --json for machine-readable scores. To inspect a downloaded 4DN package offline, run python cfde_evaluator/offline_demo.py PATH_TO_ZIP.
 
 ## GitHub Pages
 

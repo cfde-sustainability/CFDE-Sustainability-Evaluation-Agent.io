@@ -26,7 +26,7 @@ def run(program, key):
     try:
         assets = engine.releases(program)
         if not assets:
-            emit("Not evaluated · no current approved C2M2 submission", outcome=True)
+            emit("Not evaluated · no public Workbench submission listed", outcome=True)
         with sqlite3.connect(engine.ROOT / "reviews.sqlite") as db:
             db.execute("create table if not exists results(id text primary key,program text,body text)")
             for index, asset in enumerate(assets, 1):
