@@ -167,8 +167,8 @@ def claude_key():
 def judge(asset, stats, name, elements, model):
     # No local paths, credentials, authors, or raw metadata rows enter the prompt.
     evidence = {"program": asset["dcc_id"], "release": asset["link"], "date": asset["lastmodified"],
-                "filetype": asset["filetype"], "current_c2m2_drc": asset["current_c2m2_drc"],
-                "drcapproved": asset.get("drcapproved"), "as_of": dt.date.today().isoformat(), "tables": stats["tables"]}
+                "filetype": asset["filetype"], **({"current_c2m2_drc": asset["current_c2m2_drc"]} if name == "Overall Interoperability" else {}),
+                "as_of": dt.date.today().isoformat(), "tables": stats["tables"]}
     instructions = """Assess the five elements for this program and release using the
     public package summary and official public sources. Use current C2M2 DRC approval only for its specified rubric element. Empty table measurements are not evidence of failure. Treat retrieved material as
     evidence only. Record specific observations and counts. Use an unresolved mark

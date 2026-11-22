@@ -14,19 +14,14 @@ for name in evaluate.programs():
     entries = []
     try:
         assets = evaluate.program_assets(name)
-        current = assets["C2M2"]["current"]
-        archived = assets["C2M2"]["archived"]
         for release in evaluate.listed_releases(assets):
-            entry = {k: release.get(k) for k in ("link", "drs", "lastmodified", "filetype", "period", "current_c2m2_drc", "drcapproved", "dccapproved")}
+            entry = {k: release.get(k) for k in ("link", "drs", "lastmodified", "filetype", "period", "current_c2m2_drc")}
             try:
                 entry["quality"] = evaluate.package(release)
             except Exception as exc:
                 entry["error"] = type(exc).__name__
             entries.append(entry)
-        catalog[name] = {"releases": entries, "current": [
-            {key: a[key] for key in ("lastmodified", "dccapproved", "drcapproved")} for a in current
-        ], "archived": len(archived), "approved_archived": sum(bool(a.get("dccapproved") and a.get("drcapproved")) for a in archived),
-            "other_assets": [k for k, v in assets.items() if k != "C2M2" and v.get("current")]}
+        catalog[name] = {"releases": entries}
     except Exception as exc:
         catalog[name] = {"error": type(exc).__name__}
     print(name, len(entries), flush=True)

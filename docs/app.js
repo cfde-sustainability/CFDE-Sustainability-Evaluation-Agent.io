@@ -22,12 +22,6 @@ function sourceInfo(){
  $('go').disabled=!usable||running;
  $('status').textContent=usable?'Ready for a fresh assessment.':info.error?'Could not check the Workbench listing.':'No public Workbench submission listed.';
  if(views.has(next)&&report)$('status').textContent=views.get(next).status;
- if(info.current){
-  for(const entry of info.current.filter(a=>!a.dccapproved||!a.drcapproved)){
-   $('evidence').append(node('p',entry.lastmodified+' · DCC approval: '+(entry.dccapproved?'yes':'no')+' · DRC approval: '+(entry.drcapproved?'yes':'no')));
-  }
-  if(!release)$('evidence').append(node('p',info.archived+' archived C2M2 entries ('+info.approved_archived+' with both approvals).'+(info.other_assets.length?' Other current asset types: '+info.other_assets.join(', ')+'.':'')));
- }
  $('evidence').append(urlLink('https://cfde.cloud/info/dcc/'+encodeURIComponent(program)));
 }
 function selectProgram(){
@@ -186,7 +180,7 @@ $('start').onsubmit=async e=>{
    try{
     stages[name]='Running';
     log('Criterion '+(index+1)+' of '+entries.length+' · '+name+' · researching');
-    const result=await scoreCriterion(key,name,elements,{program:report.program,release:p.link,date:p.lastmodified,filetype:p.filetype,period:p.period,current_c2m2_drc:p.current_c2m2_drc,drcapproved:p.drcapproved,as_of:report.started.slice(0,10),tables:p.quality?.tables||{}},signal);
+    const result=await scoreCriterion(key,name,elements,{program:report.program,release:p.link,date:p.lastmodified,filetype:p.filetype,period:p.period,...(name==='Overall Interoperability'?{current_c2m2_drc:p.current_c2m2_drc}:{}),as_of:report.started.slice(0,10),tables:p.quality?.tables||{}},signal);
     signal.throwIfAborted();
     report.criteria[name]=result;stages[name]='Complete';log(name+' · complete');
    }catch(error){
