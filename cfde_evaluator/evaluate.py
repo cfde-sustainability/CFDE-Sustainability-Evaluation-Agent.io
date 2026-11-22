@@ -56,7 +56,7 @@ def programs():
     return names
 
 
-def releases(program):
+def program_assets(program):
     progress(f"Checking approved C2M2 submissions for {program}")
     html = page(DIRECTORY + "/" + quote(program, safe=""))
     for payload in re.findall(r'self\.__next_f\.push\((\[.*?\])\)</script>', html, re.S):
@@ -64,8 +64,16 @@ def releases(program):
         if not isinstance(chunk, str) or '"fulldata":' not in chunk:
             continue
         data, _ = json.JSONDecoder().raw_decode(chunk.split('"fulldata":', 1)[1])
-        return [a for a in data["C2M2"]["current"] if a["dccapproved"] and a["drcapproved"]]
+        return data
     raise ValueError("Unrecognized program page")
+
+
+def approved(asset):
+    return asset["dccapproved"] is True and asset["drcapproved"] is True
+
+
+def releases(program):
+    return [asset for asset in program_assets(program)["C2M2"]["current"] if approved(asset)]
 
 
 def package(asset):

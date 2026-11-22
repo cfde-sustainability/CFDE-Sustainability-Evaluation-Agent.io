@@ -2,16 +2,33 @@ const $ = id => document.getElementById(id);
 const node = (tag, text='') => Object.assign(document.createElement(tag),{textContent:text});
 let catalog, rubric, report, running=false, controller;
 let stages={};
+const views=new Map();let viewKey;
 function log(message){$('status').textContent=message;$('log').prepend(new Date().toLocaleTimeString()+' · '+message+'\n')}
 function urlLink(url){const a=node('a',url);if(/^https?:\/\//i.test(url)){a.href=url;a.target='_blank';a.rel='noreferrer'}return a}
 function selected(){return catalog.programs[$('program').value]?.releases?.[Number($('release').value)]}
 function sourceInfo(){
- const release=selected();$('evidence').replaceChildren();
+ const release=selected(),program=$('program').value,info=catalog.programs[program];
+ const next=JSON.stringify([program,release?.drs]);
+ if(viewKey!==next){
+  if(report)views.set(viewKey,{report,stages,counts:$('counts').textContent,log:$('log').textContent,status:$('status').textContent});
+  viewKey=next;const saved=views.get(next);report=saved?.report;stages=saved?.stages||{};
+  $('bar').value=Object.keys(report?.criteria||{}).length;
+  $('counts').textContent=saved?.counts||'0 / 11 complete';$('log').textContent=saved?.log||'';draw();
+ }
+ $('evidence').replaceChildren();
  $('evidence').append('Public metadata checked '+new Date(catalog.checked).toLocaleString()+'. ');
  if(release){$('evidence').append(urlLink(release.link));}
  const usable=!!release?.quality;
  $('go').disabled=!usable||running;
- $('status').textContent=usable?'Ready for a fresh assessment.':catalog.programs[$('program').value]?.error||release?.error?'Package measurements unavailable.':'Not evaluated · no approved current submission listed.';
+ $('status').textContent=usable?'Ready for a fresh assessment.':catalog.programs[$('program').value]?.error||release?.error?'Package measurements unavailable.':info.current?.length?'Current C2M2 submission listed · scoring requires both DCC and DRC approval.':'No current C2M2 submission listed.';
+ if(views.has(next)&&report)$('status').textContent=views.get(next).status;
+ if(info.current){
+  for(const entry of info.current.filter(a=>!a.dccapproved||!a.drcapproved)){
+   $('evidence').append(node('p',entry.lastmodified+' · DCC approval: '+(entry.dccapproved?'yes':'no')+' · DRC approval: '+(entry.drcapproved?'yes':'no')));
+  }
+  if(!release)$('evidence').append(node('p',info.archived+' archived C2M2 entries ('+info.approved_archived+' with both approvals).'+(info.other_assets.length?' Other current asset types: '+info.other_assets.join(', ')+'.':'')));
+ }
+ $('evidence').append(urlLink('https://cfde.cloud/info/dcc/'+encodeURIComponent(program)));
 }
 function selectProgram(){
  $('release').replaceChildren();
