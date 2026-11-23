@@ -17,12 +17,13 @@ function sourceInfo(){
  }
  $('evidence').replaceChildren();
  $('evidence').append('Public metadata checked '+new Date(catalog.checked).toLocaleString()+'. ');
- if(release){$('evidence').append(urlLink(release.link));}
+ if(release){const link=urlLink(release.link);link.textContent='Submission file';$('evidence').append(link);}
  const usable=!!release;
  $('go').disabled=!usable||running;
  $('status').textContent=usable?'Ready for a fresh assessment.':info.error?'Could not check the Workbench listing.':'No public Workbench submission listed.';
  if(views.has(next)&&report)$('status').textContent=views.get(next).status;
- $('evidence').append(urlLink('https://cfde.cloud/info/dcc/'+encodeURIComponent(program)));
+ const programLink=urlLink('https://cfde.cloud/info/dcc/'+encodeURIComponent(program));
+ programLink.textContent='Program page';$('evidence').append(programLink);
 }
 function selectProgram(){
  $('release').replaceChildren();
@@ -126,11 +127,22 @@ function summary(){
  const status=complete?(home<=1||points<30?'At risk':points<40?'Actions required to be fully sustainable':'On track to Sustainability'):items.length===55?'Review required':'Evaluation incomplete';
  return {points,unresolved,complete,status,items:items.length};
 }
+const sections=[
+ ['I. Data Context and Interoperability',['Metadata Model','Ontologies & Vocabularies','Persistent Identifiers','Overall Interoperability']],
+ ['II. Data History and Reproducibility',['Processing Provenance','Sample Lineage','Versioning','Documentation']],
+ ['III. Data Stewardship and Reuse',['Current Status','Long-term Home','Reuse & Support']]
+];
 function draw(openName){
- const s=summary();$('rows').replaceChildren();$('details').replaceChildren();
+ const s=summary();Array.from($('overview').tBodies).forEach(body=>body.remove());$('details').replaceChildren();
  $('total').textContent=report?report.program+' · '+s.points+' points · '+s.items+'/55 assessed · '+s.unresolved+' pending · '+s.status+(report.verified?' · Team verified':''):'Awaiting evaluation';
  $('confirm').disabled=running||!s.complete||report?.verified;$('export').disabled=!s.items;
- for(const [name,elements] of Object.entries(rubric)){
+ for(const [title,names] of sections){
+  const body=$('overview').createTBody();
+  const heading=node('th',title);heading.colSpan=7;heading.scope='rowgroup';heading.className='section-heading';
+  body.insertRow().append(heading);
+  $('details').append(node('h3',title));
+  for(const name of names){
+  const elements=rubric[name];
   const row=node('tr'),panel=node('details'),items=report?.criteria[name];
   panel.open=openName===name;panel.append(node('summary',name));row.append(node('th',name));
   let points=0,pending=false;
@@ -153,7 +165,8 @@ function draw(openName){
    }
    row.append(cell);panel.append(a);
   });
-  row.append(node('td',!items?(stages[name]||'Waiting'):pending?'Pending':points+'/5'));$('rows').append(row);$('details').append(panel);
+  row.append(node('td',!items?(stages[name]||'Waiting'):pending?'Pending':points+'/5'));body.append(row);$('details').append(panel);
+  }
  }
 }
 $('start').onsubmit=async e=>{
