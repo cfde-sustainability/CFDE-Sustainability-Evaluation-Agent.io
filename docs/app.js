@@ -128,9 +128,9 @@ function summary(){
  return {points,unresolved,complete,status,items:items.length};
 }
 const sections=[
- ['I. Data Context and Interoperability',['Metadata Model','Ontologies & Vocabularies','Persistent Identifiers','Overall Interoperability']],
- ['II. Data History and Reproducibility',['Processing Provenance','Sample Lineage','Versioning','Documentation']],
- ['III. Data Stewardship and Reuse',['Current Status','Long-term Home','Reuse & Support']]
+ ['I. Data Context And Interoperability',['Metadata Model','Ontologies & Vocabularies','Persistent Identifiers','Overall Interoperability']],
+ ['II. Data History And Reproducibility',['Processing Provenance','Sample Lineage','Versioning','Documentation']],
+ ['III. Data Stewardship And Reuse',['Current Status','Long-term Home','Reuse & Support']]
 ];
 function draw(openName){
  const s=summary();Array.from($('overview').tBodies).forEach(body=>body.remove());$('details').replaceChildren();
@@ -144,7 +144,7 @@ function draw(openName){
   for(const name of names){
   const elements=rubric[name];
   const row=node('tr'),panel=node('details'),items=report?.criteria[name];
-  panel.open=openName===name;panel.append(node('summary',name));row.append(node('th',name));
+  panel.open=openName===name;panel.append(node('summary',name.replace(/-([a-z])/g,(_,c)=>'-'+c.toUpperCase())));row.append(node('th',name.replace(/-([a-z])/g,(_,c)=>'-'+c.toUpperCase())));
   let points=0,pending=false;
   elements.forEach((element,i)=>{
    const x=items?.[i],score=x?(x.human||x).mark:null,cell=node('td',x?String(score):'—'),a=node('article');
@@ -159,7 +159,7 @@ function draw(openName){
      for(const [t,v] of [['Select score',''],['Yes · 1','1'],['No · 0','0']])choice.add(new Option(t,v));
      choice.value=x.human?String(score):'';reason.value=x.human?.reason||'';source.value=x.human?.source||x.sources[0]||'';
      for(const [title,field] of [['Team score',choice],['Reason',reason],['Evidence reference',source]]){const l=node('label',title);field.required=true;l.append(field);f.append(l)}
-     f.append(node('button','Save decision'));f.onsubmit=e=>{e.preventDefault();if(!reason.value.trim()||!source.value.trim())return;
+     f.append(node('button','Save Decision'));f.onsubmit=e=>{e.preventDefault();if(!reason.value.trim()||!source.value.trim())return;
       x.human={mark:Number(choice.value),reason:reason.value.trim(),source:source.value.trim()};report.verified=false;draw(name)};a.append(f)
     }
    }
@@ -212,7 +212,7 @@ $('stop').onclick=()=>{
  if(!running||controller.signal.aborted)return;
  $('stop').disabled=true;controller.abort();log('Stopping outstanding requests…');
 };
-$('confirm').onclick=()=>{if(summary().complete){report.verified=true;draw();log('Team recount confirmed.')}};
+$('confirm').onclick=()=>{if(summary().complete){report.verified=true;draw();log('Manual review confirmed.')}};
 $('export').onclick=()=>{const url=URL.createObjectURL(new Blob([JSON.stringify({...report,summary:summary()},null,2)],{type:'application/json'}));
  const a=node('a');a.href=url;a.download='CFDE-'+report.program+'-assessment.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)};
 $('program').onchange=selectProgram;$('release').onchange=sourceInfo;
