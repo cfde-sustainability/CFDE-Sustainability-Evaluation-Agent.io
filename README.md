@@ -39,10 +39,10 @@ The 11 criteria are grouped into three sections. Each criterion has five element
 
 | Grade | Score Criteria |
 | --- | --- |
-| **On track to Sustainability** | Total ≥ 40 / 55 |
-| **Actions required to be fully sustainable** | Total 30–39 |
-| **At risk** | Total < 30, **or** Long-term Home ≤ 1 |
-| **Not evaluated** | No CFDE submission is listed for the program |
+| On track to Sustainability | Total ≥ 40 / 55 |
+| Actions required to be fully sustainable| Total 30–39 |
+| At risk | Total < 30, **or** Long-term Home ≤ 1 |
+| Not evaluated | No CFDE submission is listed for the program |
 
 ## Contact
 Maintained by the Sustainability Core. For questions, please contact us at cfdesustainability@gmail.com.
