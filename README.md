@@ -35,5 +35,14 @@ The 11 criteria are grouped into three sections. Each criterion has five element
 | **Data History and Reproducibility** | Processing Provenance · Sample Lineage · Versioning · Documentation |
 | **Data Stewardship and Reuse** | Current Status · Long-term Home · Reuse & Support |
 
+### Sustainability Grade
+
+| Grade | Score Criteria |
+| --- | --- |
+| **On track to Sustainability** | Total ≥ 40 / 55 |
+| **Actions required to be fully sustainable** | Total 30–39 |
+| **At risk** | Total < 30, **or** Long-term Home ≤ 1 |
+| **Not evaluated** | No CFDE submission is listed for the program |
+
 ## Contact
 Maintained by the Sustainability Core. For questions, please contact us at cfdesustainability@gmail.com.
