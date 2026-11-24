@@ -10,20 +10,7 @@ An agentic workflow for evaluating the quarterly submissions of Common Fund (CF)
 4. Review the per-criterion results, evidence and sources, then record any reviewer adjustments.
 
 How it works:
-1. **Choose a program**
-   Start a fresh review in the dashboard.
-
-2. **Verify the submission**
-   Download the approved metadata and verify locally.
-
-3. **Score 55 elements**
-   Claude uses the submission to score the 55 elements and explains each score.
-
-4. **Review the evidence**
-   The human-in-the-loop reviewers records Yes or No, a reason and a source.
-
-5. **Confirm the score**
-   Confirm the score and save the evaluation.
+** insert diagram
 
 ## Evaluation rubric
 
